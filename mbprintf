@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-VERSION="0.3b"
+VERSION="0.4b"
 
 # Replacement for the builtin printf, which does not handle
 # multibyte sequences (umlauts etc.) correctly.
@@ -11,9 +11,9 @@ VERSION="0.3b"
 _mbprintf()
 {
 	# _mbprintf flags width prec input
-	width=$2
-	prec=$3
-	input=$4
+	local width=$2
+	local prec=$3
+	local input=$4
 
 	if [[ $width == "*" ]]
 	then
@@ -31,7 +31,7 @@ _mbprintf()
 		input=$5
 	fi
 
-	local input=${input:0:${prec:-${#input}}}
+	input=${input:0:${prec:-${#input}}}
 	local pad=$(( ${width} > ${#input} ? ${width} - ${#input} : 0 ))
 
 	if [[ $pad -gt 0 ]]
