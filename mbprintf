@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-VERSION="0.4b"
+VERSION="0.5b"
 
 # Replacement for the builtin printf, which does not handle
 # multibyte sequences (umlauts etc.) correctly.
@@ -36,7 +36,7 @@ _mbprintf()
 
 	if [[ $pad -gt 0 ]]
 	then
-		if [[ ${1} =~ '-' ]]
+		if [[ ${1} == *-* ]]
 		then
 			echo -n "$input$(printf " %.0s" $(seq 1 $pad))"
 		else
