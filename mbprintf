@@ -1,0 +1,64 @@
+#!/usr/bin/env bash
+
+VERSION="0.1b"
+
+# Replacement for the builtin printf, which does not handle
+# multibyte sequences (umlauts etc.) correctly.
+# mbprintf() iterates through the format string, identifies
+# %.*s conversions, and delegates them to _mbprintf(), which
+# uses ${#string} to get the length of the input string in
+# characters, not bytes (like the builtin printf()).
+_mbprintf()
+{
+	# _mbprintf flags width prec input
+	local str=${4:0:${3:-${#4}}}
+	local pad=$(( ${2} > ${#str} ? ${2} - ${#str} : 0 ))
+
+	if [[ $pad -gt 0 ]]
+	then
+		if [[ ${1} == '-' ]]
+		then
+			echo -n "$str$(printf " %.0s" $(seq 1 $pad))"
+		else
+			echo -n "$(printf " %.0s" $(seq 1 $pad))$str"
+		fi
+	else
+		echo -n "$str"
+
+	fi
+}
+
+mbprintf()
+{
+	# To be called just like the builtin printf
+	if [[ $1 =~ ^(%([-+0 #]+)?([0-9]+|\*)?(\.)?([0-9]+|\*)?([aAcdeEfFgGiopsuxX%]))(.*)? ]]
+	then
+		local rest=${BASH_REMATCH[7]}
+
+		case ${BASH_REMATCH[6]} in
+			s )
+				shift
+				_mbprintf "${BASH_REMATCH[2]}" "${BASH_REMATCH[3]:-0}" "${BASH_REMATCH[5]}" "$@"
+				;;
+			* )
+				shift
+				printf "${BASH_REMATCH[1]}" "$@"
+				;;
+		esac
+
+		[[ ${BASH_REMATCH[3]} == "*" ]] && shift
+		[[ ${BASH_REMATCH[5]} == "*" ]] && shift
+	elif [[ $1 =~ ^([^%]+)(%.*)? ]]
+	then
+		echo -ne ${BASH_REMATCH[1]}
+		local rest=${BASH_REMATCH[2]}
+	fi
+
+	if [[ -n $rest ]]
+	then
+		shift
+		mbprintf "$rest" "$@"
+	fi
+}
+
+mbprintf "$@"
