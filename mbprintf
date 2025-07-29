@@ -62,7 +62,7 @@ mbprintf()
 				;;
 			* )
 				shift
-				printf "${BASH_REMATCH[1]}" "$@"
+				printf -- "${BASH_REMATCH[1]}" "$@"
 				;;
 		esac
 
